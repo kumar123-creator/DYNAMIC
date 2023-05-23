@@ -1,4 +1,6 @@
 <script>
+  import 'bootstrap/dist/css/bootstrap.min.css';
+  
   let formData = {
     name: '',
     email: '',
