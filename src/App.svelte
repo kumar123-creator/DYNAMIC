@@ -5,7 +5,7 @@
   
   onMount(async () => {
     try {
-      const response = await fetch('https://api.example.com/form-fields');
+      const response = await fetch('https://api.recruitly.io/api/job?apiKey=TEST64518616D4CF145D4E20BD47169EA7229BA3');
       formFields = await response.json();
     } catch (error) {
       console.error(error);
