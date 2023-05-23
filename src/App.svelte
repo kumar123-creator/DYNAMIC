@@ -1,6 +1,6 @@
 <script>
   import 'bootstrap/dist/css/bootstrap.min.css';
-  
+
   let formData = {
     name: '',
     email: '',
@@ -41,19 +41,27 @@
 
 <main>
   <form on:submit={handleSubmit}>
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" bind:value={formData.name} />
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" class="form-control" bind:value={formData.name} />
+    </div>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" bind:value={formData.email} />
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" class="form-control" bind:value={formData.email} />
+    </div>
 
-    <label for="phone">Phone</label>
-    <input type="tel" id="phone" name="phone" bind:value={formData.phone} />
+    <div class="form-group">
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" class="form-control" bind:value={formData.phone} />
+    </div>
 
-    <label for="cv">Upload CV</label>
-    <input type="file" id="cv" name="cv" on:change={handleCVUpload} />
+    <div class="form-group">
+      <label for="cv">Upload CV</label>
+      <input type="file" id="cv" name="cv" class="form-control-file" on:change={handleCVUpload} />
+    </div>
 
-    <button type="submit">Submit</button>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </main>
 
@@ -69,6 +77,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 300px;
   }
 
   label {
@@ -76,12 +85,15 @@
   }
 
   input {
-    padding: 0.5rem;
     margin-bottom: 1rem;
-    width: 300px;
   }
 
-  button {
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .btn {
     padding: 0.5rem 1rem;
   }
 </style>
+``
