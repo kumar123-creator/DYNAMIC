@@ -7,7 +7,40 @@
     mobile: ''
   };
 
-  let cvFile;
+<script>
+  let cvFile = null;
+
+  function handleFileChange(event) {
+    cvFile = event.target.files[0];
+  }
+
+  async function uploadCV() {
+    if (cvFile) {
+      const base64Data = await toBase64(cvFile);
+      const postData = {
+        fileContent: base64Data
+      };
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+      });
+
+      // Handle the response as needed
+    }
+  }
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+    });
+  }
 
   function handleSubmit() {
     const jsonData = {
