@@ -1,74 +1,85 @@
 <script>
-  import { onMount } from 'svelte';
+    let formData = {
+      name: '',
+      email: '',
+      phone: ''
+    };
   
-  let formFields = [];
+    let cvFile;
   
-  onMount(async () => {
-    try {
-      const response = await fetch('https://api.recruitly.io/api/job?apiKey=TEST64518616D4CF145D4E20BD47169EA7229BA3');
-      formFields = await response.json();
-    } catch (error) {
-      console.error(error);
+    function handleSubmit() {
+      const form = new FormData();
+      form.append('name', formData.name);
+      form.append('email', formData.email);
+      form.append('phone', formData.phone);
+      form.append('cv', cvFile);
+  
+      fetch('https://recruitly-dev.postman.co/workspace/Recruitly-Workspace~60cb4f48-0bbe-49e7-8a17-511240cebdd1/request/14566262-07d1281d-379f-41f1-a88c-ff6fb6e20d8c', {
+        method: 'POST',
+        body: form
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the response data
+          console.log(data);
+        })
+        .catch(error => {
+          // Handle any errors
+          console.error(error);
+        });
     }
-  });
   
-   function handleSubmit(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    console.log('Submitted data:', data);
-    // Handle form submission or API call with the form data
-  }
-</script>
-
-<main>
-  {#if formFields.length > 0}
+    function handleCVUpload(event) {
+      cvFile = event.target.files[0];
+    }
+  </script>
+  
+  <main>
     <form on:submit={handleSubmit}>
-      {#each formFields as field}
-        <label for={field.name}>{field.label}</label>
-        {#if field.type === 'text'}
-          <input type={field.type} id={field.name} name={field.name} />
-        {:else if field.type === 'select'}
-          <select id={field.name} name={field.name}>
-            {#each field.options as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </select>
-        {/if}
-      {/each}
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" bind:value={formData.name} />
+  
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" bind:value={formData.email} />
+  
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" bind:value={formData.phone} />
+  
+      <label for="cv">Upload CV</label>
+      <input type="file" id="cv" name="cv" on:change={handleCVUpload} />
+  
       <button type="submit">Submit</button>
     </form>
-  {:else}
-    <p>Loading form fields...</p>
-  {/if}
-</main>
-
-<style>
-  main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  label {
-    margin-bottom: 0.5rem;
-  }
-
-  input,
-  select {
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    width: 300px;
-  }
-
-  button {
-    padding: 0.5rem 1rem;
-  }
-</style>
+  </main>
+  
+  <style>
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+  
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    label {
+      margin-bottom: 0.5rem;
+    }
+  
+    input {
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      width: 300px;
+    }
+  
+    button {
+      padding: 0.5rem 1rem;
+    }
+  </style>
+  
+  
+  
