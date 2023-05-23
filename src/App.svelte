@@ -6,8 +6,7 @@
     email: '',
     mobile: ''
   };
-
-<script>
+  
   let cvFile = null;
 
   function handleFileChange(event) {
