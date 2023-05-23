@@ -1,12 +1,15 @@
 <script>
     let formData = {
-      name: '',
-      email: '',
-      phone: ''
+      private String name: '',
+      private String email: '',
+      private String phone: ''
     };
   
-    let cvFile;
-  
+    let cvFile ={
+        private String fileContent;
+        private String fileName;
+    };
+     
     function handleSubmit() {
       const form = new FormData();
       form.append('name', formData.name);
