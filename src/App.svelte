@@ -1,68 +1,97 @@
 <script>
-  let questions = [
-    {
-      question: 'What is the capital of France?',
-      options: ['Paris', 'London', 'Madrid', 'Berlin'],
-      correctAnswer: 'Paris',
-      selectedAnswer: ''
-    },
-    {
-      question: 'Which planet is known as the Red Planet?',
-      options: ['Mars', 'Venus', 'Jupiter', 'Mercury'],
-      correctAnswer: 'Mars',
-      selectedAnswer: ''
-    },
-    {
-      question: 'What is the largest ocean in the world?',
-      options: ['Pacific Ocean', 'Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean'],
-      correctAnswer: 'Pacific Ocean',
-      selectedAnswer: ''
-    }
-  ];
+  import { onMount } from 'svelte';
 
-  let currentQuestionIndex = 0;
-  let score = 0;
+  let formFields = [];
 
-  function selectAnswer(option) {
-    questions[currentQuestionIndex].selectedAnswer = option;
-  }
-
-  function nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
-      currentQuestionIndex++;
-    } else {
-      calculateScore();
+  async function fetchFormFields() {
+    try {
+      const response = await fetch('https://api.recruitly.io/api/job?apiKey=TEST64518616D4CF145D4E20BD47169EA7229BA3');
+      formFields = await response.json();
+    } catch (error) {
+      console.error(error);
     }
   }
 
-  function calculateScore() {
-    score = questions.reduce((totalScore, question) => {
-      if (question.selectedAnswer === question.correctAnswer) {
-        return totalScore + 1;
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const formValues = {};
+
+    for (let [key, value] of formData.entries()) {
+      formValues[key] = value;
+    }
+
+    try {
+      const response = await fetch(https://api.recruitly.io/api/job?apiKey=TEST64518616D4CF145D4E20BD47169EA7229BA3', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formValues)
+      });
+
+      if (response.ok) {
+        // Handle successful form submission
+        console.log('Form submitted successfully!');
       } else {
-        return totalScore;
+        // Handle form submission error
+        console.error('Error submitting form');
       }
-    }, 0);
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  onMount(fetchFormFields);
 </script>
 
+<main>
+  {#if formFields.length > 0}
+    <form on:submit={handleSubmit}>
+      {#each formFields as field}
+        <label for={field.name}>{field.label}</label>
+        {#if field.type === 'text'}
+          <input type="text" id={field.name} name={field.name} />
+        {:else if field.type === 'email'}
+          <input type="email" id={field.name} name={field.name} />
+        {:else if field.type === 'number'}
+          <input type="number" id={field.name} name={field.name} />
+        {:else}
+          <!-- Handle other field types here -->
+        {/if}
+      {/each}
+      <button type="submit">Submit</button>
+    </form>
+  {:else}
+    <p>Loading form fields...</p>
+  {/if}
+</main>
+
 <style>
-  /* Add styling for the quiz app */
+  main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  label {
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    width: 300px;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+  }
 </style>
-
-{#if currentQuestionIndex < questions.length}
-  <h2>Question {currentQuestionIndex + 1}</h2>
-  <p>{questions[currentQuestionIndex].question}</p>
-
-  <ul>
-    {#each questions[currentQuestionIndex].options as option}
-      <li on:click={() => selectAnswer(option)}>{option}</li>
-    {/each}
-  </ul>
-
-  <button on:click={nextQuestion}>Next</button>
-{:else}
-  <h2>Quiz Completed</h2>
-  <p>Your Score: {score}/{questions.length}</p>
-{/if}
-
