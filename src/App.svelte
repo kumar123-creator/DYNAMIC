@@ -17,7 +17,7 @@
     formData.append('data', JSON.stringify(jsonData));
     formData.append('cv', cvFile);
 
-    fetch('https://example.com/api/endpoint', {
+    fetch('https://api.recruitly.io/api/cvsubmit/bytes?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
       method: 'POST',
       body: formData
     })
