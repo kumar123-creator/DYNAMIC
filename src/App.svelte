@@ -4,7 +4,7 @@
   let formData = {
     name: '',
     email: '',
-    phone: ''
+    mobile: ''
   };
 
   let cvFile;
@@ -52,8 +52,8 @@
     </div>
 
     <div class="form-group">
-      <label for="phone">Phone</label>
-      <input type="tel" id="phone" name="phone" class="form-control" bind:value={formData.phone} />
+      <label for="mobile">Mobile</label>
+      <input type="tel" id="Mobile" name="mobile" class="form-control" bind:value={formData.mobile} />
     </div>
 
     <div class="form-group">
