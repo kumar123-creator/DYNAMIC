@@ -38,6 +38,8 @@
         // Handle the response as needed
         if (response.ok) {
           console.log('CV uploaded successfully');
+           resetForm();
+        location.reload();
         } else {
           console.error('Failed to upload CV');
         }
@@ -101,7 +103,6 @@
 
   <input type="file" accept=".pdf,.doc,.docx" on:change={handleFileChange} />
 
-  <button class="btn btn-primary" on:click={uploadCV}>Upload</button>
+  <button class="btn btn-primary" on:click={uploadCV}>Submit</button>
 
-  <button class="btn btn-secondary" on:click={() => resetForm()}>Reset</button>
 </main>
