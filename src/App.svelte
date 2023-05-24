@@ -1,5 +1,5 @@
 
-   <script>
+  <script>
   let fullName = '';
   let email = '';
   let mobile = '';
@@ -38,8 +38,8 @@
         // Handle the response as needed
         if (response.ok) {
           console.log('CV uploaded successfully');
-           resetForm();
-        location.reload();
+          resetForm();
+          location.reload();
         } else {
           console.error('Failed to upload CV');
         }
@@ -86,23 +86,25 @@
 <main>
   <h1>CANDIDATE FORM</h1>
 
-  <label>
-    Full Name:
-    <input type="text" bind:value={fullName} />
-  </label>
+  <div class="form-group">
+    <label for="fullName">Full Name:</label>
+    <input class="form-control" type="text" id="fullName" bind:value={fullName} placeholder="Enter your full name" />
+  </div>
 
-  <label>
-    Email:
-    <input type="email" bind:value={email} />
-  </label>
+  <div class="form-group">
+    <label for="email">Email:</label>
+    <input class="form-control" type="email" id="email" bind:value={email} placeholder="Enter your email address" />
+  </div>
 
-  <label>
-    Mobile:
-    <input type="tel" bind:value={mobile} />
-  </label>
+  <div class="form-group">
+    <label for="mobile">Mobile:</label>
+    <input class="form-control" type="tel" id="mobile" bind:value={mobile} placeholder="Enter your mobile number" />
+  </div>
 
-  <input type="file" accept=".pdf,.doc,.docx" on:change={handleFileChange} />
+  <div class="form-group">
+    <label for="cvFile">CV File:</label>
+    <input class="form-control-file" type="file" accept=".pdf,.doc,.docx" id="cvFile" on:change={handleFileChange} />
+  </div>
 
   <button class="btn btn-primary" on:click={uploadCV}>Submit</button>
-
 </main>
