@@ -20,7 +20,7 @@
         fileContent: base64Data
       };
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('https://api.recruitly.io/api/cvsubmit/bytes?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
