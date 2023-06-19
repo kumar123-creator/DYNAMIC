@@ -1,90 +1,207 @@
 <script>
   import { onMount } from 'svelte';
+  import 'bootstrap/dist/css/bootstrap.min.css'
 
-  let candidates = [];
+  let fullName = '';
+  let email = '';
+  let mobile = '';
+  let cvFile = null;
+  let address = '';
+  let languages = '';
+  let experience = '';
+  let dob = '';
+  let rating = '';
+  let fileContent = '';
+  let fileName = ''; 
+  let formErrors = {};
 
-  // Function to add a new candidate
-  function addCandidate() {
-    candidates = [...candidates, { name: '', email: '', phone: '' }];
+  async function handleFileChange(event) {
+    cvFile = event.target.files[0];
+    fileContent = await toBase64(cvFile);
+    fileName = cvFile.name;
   }
 
-  // Function to remove a candidate
-  function removeCandidate(index) {
-    candidates = candidates.filter((_, i) => i !== index);
+  async function uploadCV() {
+    formErrors = {};
+
+    if (!isValidName(fullName.trim())) {
+      formErrors.fullName = 'Please enter a valid name with only letters.';
+    }
+
+    if (!email.trim()) {
+      formErrors.email = 'Email is required.';
+    } else if (!isValidEmail(email)) {
+      formErrors.email = 'Please enter a valid email address.';
+    }
+
+    if (!mobile.trim()) {
+      formErrors.mobile = 'Mobile is required.';
+    } else if (!isValidMobile(mobile)) {
+      formErrors.mobile = 'Please enter a valid mobile number having 10 digits.';
+    }
+
+    if (!cvFile) {
+      formErrors.cvFile = 'CV file is required.';
+    }
+
+    if (Object.keys(formErrors).length === 0) {
+      const postData = {
+        fullName,
+        email,
+        mobile,
+        address,
+        languages,
+        experience,
+        dob,
+        rating
+        fileContent,
+        fileName,
+       
+      };
+
+      try {
+        const response = await fetch('https://api.recruitly.io/api/candidateform/details/267fef3c-8418-455b-9ed7-fc75a33387e4?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        });
+
+        // Handle the response as needed
+        if (response.ok) {
+          console.log('CV uploaded successfully');
+          resetForm();
+          location.reload();
+        } else {
+          console.error('Failed to upload CV');
+        }
+      } catch (error) {
+        console.error('Error uploading CV:', error);
+      }
+    }
   }
 
-  // Lifecycle hook to add an initial candidate
-  onMount(async () => {
-    try {
-      const response = await fetch(
-        'https://api.recruitly.io/api/candidateform/details/72fbc0da-3810-4ad9-a922-1845f8974eb7?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77'
-      );
-      const data = await response.json();
-      candidates = data.candidates.map(candidate => ({ ...candidate }));
-    } catch (error) {
-      console.error('Error fetching data:', error);
+  function isValidName(name) {
+    const nameRegex = /^[A-Za-z]+$/;
+    return nameRegex.test(name);
+  }
+
+  function isValidEmail(email) {
+    // Basic email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function isValidMobile(mobile) {
+    // Basic mobile number validation regex
+    const mobileRegex = /^[0-9+]{10}$/;
+    return mobileRegex.test(mobile);
+  }
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  function resetForm() {
+    fullName = '';
+    email = '';
+    mobile = '';
+    cvFile = null;
+    address = '';
+    languages = '';
+    experience = '';
+    dob = '';
+    rating = '';
+    fileContent = '';
+    fileName = '';
+    formErrors = {};
+  }
+
+  onMount(() => {
+    // Reset the file input after submission
+    const fileInput = document.getElementById('cvFileInput');
+    if (fileInput) {
+      fileInput.value = '';
     }
   });
 </script>
 
+<svelte:head>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+</svelte:head>
+
+<div class="form-group">
+  <label for="firstName">Full Name:</label>
+  <input type="text" class="form-control" id="firstName" bind:value={fullName} placeholder="Enter your full name" />
+  {#if formErrors.fullName}
+  <p class="text-danger">{formErrors.fullName}</p>
+  {/if}
+</div>
+
+<div class="form-group">
+  <label for="email">Email:</label>
+  <input type="email" class="form-control" id="email" bind:value={email} placeholder="Enter your email" />
+  {#if formErrors.email}
+  <p class="text-danger">{formErrors.email}</p>
+  {/if}
+</div>
+
+<div class="form-group">
+  <label for="mobile">Mobile:</label>
+  <input type="tel" class="form-control" id="mobile" bind:value={mobile} placeholder="Enter your mobile number" />
+  {#if formErrors.mobile}
+  <p class="text-danger">{formErrors.mobile}</p>
+  {/if}
+</div>
+
+<div class="form-group">
+  <label for="cvFileInput">CV File:</label>
+  <input type="file" class="form-control" accept=".pdf,.doc,.docx" id="cvFileInput" on:change={handleFileChange} />
+  {#if formErrors.cvFile}
+  <p class="text-danger">{formErrors.cvFile}</p>
+  {/if}
+</div>
+
+<div class="form-group">
+  <label for="address">Address:</label>
+  <input type="text" class="form-control" id="address" bind:value={address} placeholder="Enter your address" />
+</div>
+
+<div class="form-group">
+  <label for="languages">Languages:</label>
+  <input type="text" class="form-control" id="languages" bind:value={languages} placeholder="Enter languages you know" />
+</div>
+
+<div class="form-group">
+  <label for="experience">Experience:</label>
+  <input type="text" class="form-control" id="experience" bind:value={experience} placeholder="Enter your experience" />
+</div>
+
+<div class="form-group">
+  <label for="dob">Date of Birth:</label>
+  <input type="date" class="form-control" id="dob" bind:value={dob} />
+</div>
+
+<div class="form-group">
+  <label for="rating">Rating:</label>
+  <input type="number" class="form-control" id="rating" bind:value={rating} min="0" max="5" step="0.1" placeholder="Enter your rating" />
+</div>
+
+<div class="form-group">
+  <button class="btn btn-primary" on:click={uploadCV}>Submit</button>
+</div>
+
 <style>
-  .container {
-    padding: 2rem;
-  }
-
-  .card {
-    margin-bottom: 1rem;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1.25rem;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-  }
-
-  .card-body {
-    padding: 1rem;
-  }
-
-  .btn {
-    margin-right: 0.5rem;
+  .text-danger {
+    color: red;
   }
 </style>
-
-<div class="container">
-  <h1>Dynamic Candidate Form</h1>
-
-  {#each candidates as candidate, index}
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">Candidate {index + 1}</h5>
-      {#if index > 0}
-      <button class="btn btn-danger btn-sm" on:click={() => removeCandidate(index)}>
-        Remove
-      </button>
-      {/if}
-    </div>
-    <div class="card-body">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" bind:value={candidate.name} required>
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" bind:value={candidate.email} required>
-      </div>
-
-      <div class="form-group">
-        <label for="phone">Phone</label>
-        <input type="tel" class="form-control" id="phone" bind:value={candidate.phone} required>
-      </div>
-    </div>
-  </div>
-  {/each}
-
-  <button class="btn btn-primary" on:click={addCandidate}>Add Candidate</button>
-</div>
