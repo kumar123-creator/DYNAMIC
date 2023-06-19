@@ -1,110 +1,82 @@
-
-  <script>
-  let fullName = '';
-  let email = '';
-  let mobile = '';
-  let cvFile = null;
-  let fileContent = '';
-  let fileName = '';
-
-  async function handleFileChange(event) {
-    cvFile = event.target.files[0];
-    fileContent = await toBase64(cvFile);
-    fileName = cvFile.name;
+<script>
+  import { onMount } from 'svelte';
+  
+  let candidates = [];
+  
+  // Function to add a new candidate
+  function addCandidate() {
+    candidates = [...candidates, { name: '', email: '', phone: '' }];
   }
-
-  async function uploadCV() {
-    if (validateForm()) {
-      const postData = {
-        fullName,
-        email,
-        mobile,
-        fileContent,
-        fileName
-      };
-
-      try {
-        const response = await fetch(
-          'https://api.recruitly.io/api/cvsubmit/bytes?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-          }
-        );
-
-        // Handle the response as needed
-        if (response.ok) {
-          console.log('CV uploaded successfully');
-          resetForm();
-          location.reload();
-        } else {
-          console.error('Failed to upload CV');
-        }
-      } catch (error) {
-        console.error('Error uploading CV:', error);
-      }
-    }
+  
+  // Function to remove a candidate
+  function removeCandidate(index) {
+    candidates = candidates.filter((_, i) => i !== index);
   }
-
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = error => reject(error);
-    });
-  }
-
-  function validateForm() {
-    if (!fullName || !email || !mobile || !cvFile) {
-      console.error('Please fill in all the fields and select a CV file');
-      return false;
-    }
-
-    // Add additional validation if needed
-
-    return true;
-  }
-
-  function resetForm() {
-    fullName = '';
-    email = '';
-    mobile = '';
-    cvFile = null;
-    fileContent = '';
-    fileName = '';
-  }
+  
+  // Lifecycle hook to add an initial candidate
+  onMount(() => {
+    addCandidate();
+  });
 </script>
 
 <style>
-  @import url('https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css');
+.container {
+    padding: 2rem;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .btn {
+    margin-right: 0.5rem;
+  }
 </style>
 
-<main>
-  <h1>CANDIDATE FORM</h1>
-
-  <div class="form-group">
-    <label for="fullName">Full Name:</label>
-    <input class="form-control" type="text" id="fullName" bind:value={fullName} placeholder="Enter your full name" />
-  </div>
-
-  <div class="form-group">
-    <label for="email">Email:</label>
-    <input class="form-control" type="email" id="email" bind:value={email} placeholder="Enter your email address" />
-  </div>
-
-  <div class="form-group">
-    <label for="mobile">Mobile:</label>
-    <input class="form-control" type="tel" id="mobile" bind:value={mobile} placeholder="Enter your mobile number" />
-  </div>
-
-  <div class="form-group">
-    <label for="cvFile">CV File:</label>
-    <input class="form-control-file" type="file" accept=".pdf,.doc,.docx" id="cvFile" on:change={handleFileChange} />
-  </div>
-
-  <button class="btn btn-primary" on:click={uploadCV}>Submit</button>
-</main>
+<div class="container">
+  <h1>Dynamic Candidate Form</h1>
+  
+  {#each candidates as candidate, index}
+    <div class="card mb-3">
+      <div class="card-header">
+        Candidate {index + 1}
+        {#if index > 0}
+          <button class="btn btn-danger btn-sm float-right" on:click={() => removeCandidate(index)}>
+            Remove
+          </button>
+        {/if}
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" bind:value={candidate.name} required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email" bind:value={candidate.email} required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" class="form-control" id="phone" bind:value={candidate.phone} required>
+        </div>
+      </div>
+    </div>
+  {/each}
+  
+  <button class="btn btn-primary" on:click={addCandidate}>Add Candidate</button>
+</div>
