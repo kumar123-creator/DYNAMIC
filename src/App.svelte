@@ -6,13 +6,13 @@
   let email = '';
   let mobile = '';
   let cvFile = null;
+  let fileContent = '';
+  let fileName = '';
   let address = '';
   let languages = '';
   let experience = '';
   let dob = '';
   let rating = '';
-  let fileContent = '';
-  let fileName = ''; 
   let formErrors = {};
 
   async function handleFileChange(event) {
@@ -49,18 +49,17 @@
         fullName,
         email,
         mobile,
+        fileContent,
+        fileName,
         address,
         languages,
         experience,
         dob,
         rating
-        fileContent,
-        fileName,
-       
       };
 
       try {
-        const response = await fetch('https://api.recruitly.io/api/candidateform/details/267fef3c-8418-455b-9ed7-fc75a33387e4?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
+        const response = await fetch('https://api.recruitly.io/api/cvsubmit/bytes?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -113,13 +112,13 @@
     email = '';
     mobile = '';
     cvFile = null;
+    fileContent = '';
+    fileName = '';
     address = '';
     languages = '';
     experience = '';
     dob = '';
     rating = '';
-    fileContent = '';
-    fileName = '';
     formErrors = {};
   }
 
