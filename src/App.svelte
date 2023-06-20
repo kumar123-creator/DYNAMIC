@@ -1,10 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-
   import 'bootstrap/dist/css/bootstrap.min.css';
 
   let formFields = [];
-  let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
+  let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7', 'a4fed172-671e-4d3e-810e-04f987b1c032';
   let fullname = '';
   let email = '';
   let mobile = '';
@@ -15,7 +14,6 @@
   let qualification = '';
   let yearsOfExperience = '';
   let industry = '';
-  
   let dbsCheck = '';
   let fullNRICFINPassportNumber = '';
   let dateOfBirth = '';
@@ -66,7 +64,6 @@
     formFields.push({ label: 'Qualification', value: qualification });
     formFields.push({ label: 'Years of Experience', value: yearsOfExperience });
     formFields.push({ label: 'Industry', value: industry });
-    
     formFields.push({ label: 'DBS Check', value: dbsCheck });
     formFields.push({ label: 'Full NRIC/FIN/Passport Number', value: fullNRICFINPassportNumber });
     formFields.push({ label: 'Date of Birth', value: dateOfBirth });
@@ -131,9 +128,7 @@
         <option value="English">
         <option value="Telugu">
         <option value="Hindi">
-        <option value="Kanada">
         <option value="Tamil">
-        <option value="Malayalam">
       </datalist>
     </div>
     <div class="form-group">
@@ -178,9 +173,9 @@
       <div class="select-wrapper">
         <input type="text" class="form-control" id="industry" bind:value="{industry}" placeholder="Industry"  list="industryOptions">
         <datalist id="industryOptions">
-          <option value="Hotel">
-          <option value="Residential">
-          <option value="Retail">
+          <option value="IT">
+          <option value="Automobile">
+          <option value="Software">
         </datalist>
       </div>
     </div>
@@ -195,21 +190,11 @@
         <option value="Male">
         <option value="Female">
       </datalist>
-    </div>
-    
-    <div class="form-group">
-     
+    </div> 
+    <div class="form-group">   
       <label   for="otherScheduledCaste">Other: Scheduled Caste</label>
       <input type="text" class="form-control" id="otherScheduledCaste" bind:value="{otherScheduledCaste}" placeholder="Other: Scheduled Caste">
     </div>
-    <div class="form-group">
-      <label  for="GENDER">GENDER</label>
-      <input type="text" class="form-control" id="GENDER" bind:value="{GENDER}" placeholder="GENDER">
-   
-  </div>
-
-    
-
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </main>
