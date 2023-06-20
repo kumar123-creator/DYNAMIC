@@ -4,6 +4,7 @@
 
   let formFields = [];
   let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
+  let fields = [];
 
   function fetchData() {
     fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`)
@@ -18,28 +19,24 @@
   }
 
   function handleSubmit() {
-    // Perform any necessary actions on form submission
+    const inputFields = fields.filter(field => field.value !== '');
+    formFields = inputFields.map(field => ({ label: field.label, value: field.value }));
     console.log('Form Fields:', formFields);
   }
 
+  function addField() {
+    fields.push({ label: '', value: '' });
+  }
+
+  function removeField(index) {
+    fields.splice(index, 1);
+  }
+
   onMount(() => {
-    // Add an event listener to form fields
-    function handleFieldChange(event) {
-      formId = event.target.value;
-      fetchData(); // Fetch data when the form ID is changed
-    }
-
-    const fields = document.querySelectorAll('input[type="text"]');
-    fields.forEach(field => field.addEventListener('input', handleFieldChange));
+    const inputFields = document.querySelectorAll('input[type="text"]');
+    fields = Array.from(inputFields).map(field => ({ label: field.name, value: field.value }));
+    fetchData();
   });
-
-  function addFormField() {
-    formFields = [...formFields, { label: '', value: '' }];
-  }
-
-  function removeFormField(index) {
-    formFields = formFields.filter((_, i) => i !== index);
-  }
 </script>
 
 <style>
@@ -75,45 +72,41 @@
     background-color: #0056b3;
   }
 
-  .form-container .add-field-button {
-    margin-top: 0.5rem;
-    background-color: #28a745;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    color: #fff;
-    border: none;
-    cursor: pointer;
+  .form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
   }
 
-  .form-container .remove-field-button {
-    margin-top: 0.5rem;
+  .form-field input[type="text"] {
+    margin-right: 0.5rem;
+  }
+
+  .form-field button {
     background-color: #dc3545;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    color: #fff;
-    border: none;
-    cursor: pointer;
+    margin-left: 0.5rem;
+  }
+
+  .form-field button:hover {
+    background-color: #c82333;
   }
 </style>
 
 <div class="form-container">
   <form on:submit|preventDefault={handleSubmit}>
-    {#each formFields as field, index}
-      <div class="form-group">
-        <label for={`field-${index}`} class="form-label">Field {index + 1}</label>
-        <input type="text" id={`field-${index}`} class="form-control" bind:value={field.value} />
+    {#each fields as field, index}
+      <div class="form-field">
+        <input type="text" class="form-control" bind:value={fields[index].label} placeholder="Label" />
+        <input type="text" class="form-control" bind:value={fields[index].value} placeholder="Value" />
+        <button type="button" class="btn btn-danger" on:click={() => removeField(index)}>Remove</button>
       </div>
     {/each}
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-field">
+      <button type="button" class="btn btn-primary" on:click={addField}>Add Field</button>
     </div>
-  </form>
 
-  <div class="form-group">
-    <button class="add-field-button" on:click={addFormField}>Add Field</button>
-  </div>
-  <div class="form-group">
-    <button class="remove-field-button" on:click={removeFormField}>Remove Field</button>
-  </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </div>
+
