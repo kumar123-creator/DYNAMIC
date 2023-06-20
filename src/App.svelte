@@ -4,28 +4,47 @@
 
   let fields = [];
   let formId = '';
+  let currentURL = '';
+  let stringAfterLastSlash = '';
+
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const formData = {};
+
+    for (const field of fields) {
+      formData[field.code] = event.target.elements[field.code].value;
+    }
+
+    console.log('Form Data:', formData);
+    // Perform any necessary actions with the form data
+  }
+
+  function extractStringAfterLastSlash(url) {
+    const lastIndex = url.lastIndexOf('/');
+    return url.substring(lastIndex + 1);
+  }
+
+  onMount(() => {
+    currentURL = window.location.href;
+    stringAfterLastSlash = extractStringAfterLastSlash(currentURL);
+  });
 
   onMount(async () => {
-    // Extract formId from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    formId = urlParams.get('formId') || '';
-
-    if (formId) {
-      try {
-        const response = await fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`);
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Data:', data);
-        if (Array.isArray(data.fields)) {
-          fields = data.fields;
-        } else {
-          throw new Error('Response data does not contain the "fields" property');
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+    try {
+      const response = await fetch(`https://api.recruitly.io/api/candidateform/details/${stringAfterLastSlash}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
       }
+      const data = await response.json();
+      console.log('Data:', data);
+      if (Array.isArray(data.fields)) {
+        fields = data.fields;
+      } else {
+        throw new Error('Response data does not contain the "fields" property');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
   });
 </script>
@@ -40,30 +59,36 @@
   <h2>Form Fields:</h2>
   <form>
     {#each fields as field (field.code)}
-      {#if field.type === 'file'}
-        <div class="form-group">
-          <label for="{field.code}">{field.label}</label>
-          <input class="form-control-file" type="file" id="{field.code}" name="{field.code}" accept=".pdf,.doc,.docx">
-        </div>
-      {/if}
-      {#if field.type === 'email'}
-        <div class="form-group">
-          <label for="{field.code}">{field.label}</label>
-          <input class="form-control" type="email" id="{field.code}" name="{field.code}">
-        </div>
-      {/if}
-      {#if field.type === 'tel'}
-        <div class="form-group">
-          <label for="{field.code}">{field.label}</label>
-          <input class="form-control" type="tel" id="{field.code}" name="{field.code}">
-        </div>
-      {/if}
-      {#if field.type === 'text'}
-        <div class="form-group">
-          <label for="{field.code}">{field.label}</label>
-          <input class="form-control" type="text" id="{field.code}" name="{field.code}">
-        </div>
-      {/if}
+    {#if field.code === 'CV/Resume'}
+    <div class="form-group">
+      <label for="cvResume">{field.label}</label>
+      <input class="form-control-file" type="file" id="cvResume" name={field.code} accept=".pdf,.doc,.docx">
+    </div>
+  {/if}
+  {#if field.code === 'email'}
+    <div class="form-group">
+      <label for="email">{field.label}</label>
+      <input class="form-control" type="email" id="email" name={field.code}>
+    </div>
+  {/if}
+  {#if field.code === 'mobile'}
+    <div class="form-group">
+      <label for="mobile">{field.label}</label>
+      <input class="form-control" type="tel" id="mobile" name={field.code}>
+    </div>
+  {/if}
+  {#if field.code === 'ADDRESS'}
+    <div class="form-group">
+      <label for="addressLine">{field.label}</label>
+      <input class="form-control" type="text" id="addressLine" name={field.code}>
+    </div>
+  {/if}
+  {#if field.code === 'FULL_NAME'}
+    <div class="form-group">
+      <label for="fullName">{field.label}</label>
+      <input class="form-control" type="text" id="fullName" name={field.code}>
+    </div>
+  {/if}
     {/each}
     <button class="btn btn-primary" type="submit">Submit</button>
   </form>
