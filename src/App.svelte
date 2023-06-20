@@ -4,30 +4,13 @@
 
   let formFields = [];
   let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
-  let formData = {}; // Object to store form data
-
-  // Define initial form field definitions
-  let fieldDefinitions = [
-    { id: 'fullname', label: 'Fullname', value: '' },
-    { id: 'surname', label: 'Surname', value: '' },
-    { id: 'email', label: 'Email', value: '' },
-    { id: 'mobile', label: 'Mobile', value: '' },
-    { id: 'address', label: 'Address/Location', value: '' },
-    { id: 'languages', label: 'Languages', value: '' },
-    { id: 'experience', label: 'Experience', value: '' },
-    { id: 'dob', label: 'Date of Birth', value: '' },
-    { id: 'rating', label: 'Rating', value: '' }
-  ];
 
   function fetchData() {
     fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`)
       .then(response => response.json())
       .then(data => {
         console.log('API Response:', data);
-        formFields = fieldDefinitions.map(field => ({
-          ...field,
-          value: data[field.id] || ''
-        }));
+        formFields = Object.entries(data).map(([key, value]) => ({ label: key, value }));
       })
       .catch(error => {
         console.error('API Error:', error);
@@ -35,15 +18,6 @@
   }
 
   function handleSubmit() {
-    // Clear the formFields array before populating it
-    formFields = [];
-
-    // Push the form input values to the formFields array
-    formFields = fieldDefinitions.map(field => ({
-      ...field,
-      value: formData[field.id] || ''
-    }));
-
     // Perform any necessary actions on form submission
     console.log('Form Fields:', formFields);
   }
@@ -58,6 +32,14 @@
     const fields = document.querySelectorAll('input[type="text"]');
     fields.forEach(field => field.addEventListener('input', handleFieldChange));
   });
+
+  function addFormField() {
+    formFields = [...formFields, { label: '', value: '' }];
+  }
+
+  function removeFormField(index) {
+    formFields = formFields.filter((_, i) => i !== index);
+  }
 </script>
 
 <style>
@@ -92,17 +74,46 @@
   .form-container button:hover {
     background-color: #0056b3;
   }
+
+  .form-container .add-field-button {
+    margin-top: 0.5rem;
+    background-color: #28a745;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  .form-container .remove-field-button {
+    margin-top: 0.5rem;
+    background-color: #dc3545;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
 </style>
 
 <div class="form-container">
   <form on:submit|preventDefault={handleSubmit}>
-    {#each formFields as field}
+    {#each formFields as field, index}
       <div class="form-group">
-        <label for={field.id} class="form-label">{field.label}</label>
-        <input type="text" id={field.id} class="form-control" bind:value={formData[field.id]} />
+        <label for={`field-${index}`} class="form-label">Field {index + 1}</label>
+        <input type="text" id={`field-${index}`} class="form-control" bind:value={field.value} />
       </div>
     {/each}
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
   </form>
+
+  <div class="form-group">
+    <button class="add-field-button" on:click={addFormField}>Add Field</button>
+  </div>
+  <div class="form-group">
+    <button class="remove-field-button" on:click={removeFormField}>Remove Field</button>
+  </div>
 </div>
