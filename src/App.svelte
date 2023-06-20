@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-=======
 <script>
   import { onMount } from 'svelte';
   import 'bootstrap/dist/css/bootstrap.min.css';
 
   let formFields = [];
-  let formId1 = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
-  let formId2 = 'abcdefg-1234-5678-90ab-cdef12345678';
-  let selectedFormId = formId1;
-
+  let formId = '';
   let fullname = '';
   let email = '';
   let mobile = '';
@@ -30,10 +25,10 @@
 
   function fetchData() {
     const formData = {
-      formId: selectedFormId,
+      formId,
     };
 
-    fetch(`https://api.recruitly.io/api/candidateform/details/${selectedFormId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`, {
+    fetch(`https://api.recruitly.io/api/candidateform/details/72fbc0da-3810-4ad9-a922-1845f8974eb7?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +42,12 @@
         email = data.email;
         mobile = data.mobile;
         // Update the form fields based on the fetched data
-        formFields = Object.entries(data.formFields).map(([label, value]) => ({ label, value }));
+        formFields = data.formFields.map(field => ({
+          id: field.id,
+          name: field.name,
+          code: field.code,
+          label: field.label
+        }));
       })
       .catch(error => {
         console.error('API Error:', error);
@@ -57,26 +57,6 @@
   function handleSubmit() {
     // Clear the formFields array before populating it
     formFields = [];
-
-    // Push the form input values to the formFields array
-    formFields.push({ label: 'fullname', value: fullname });
-    formFields.push({ label: 'Email', value: email });
-    formFields.push({ label: 'Mobile', value: mobile });
-    formFields.push({ label: 'Candidate CV', value: CandidateCv });
-    formFields.push({ label: 'Address/Location', value: address });
-    formFields.push({ label: 'Languages', value: languages });
-    formFields.push({ label: 'Experience', value: experience });
-    formFields.push({ label: 'Qualification', value: qualification });
-    formFields.push({ label: 'Years of Experience', value: yearsOfExperience });
-    formFields.push({ label: 'Industry', value: industry });
-    formFields.push({ label: 'DBS Check', value: dbsCheck });
-    formFields.push({ label: 'Full NRIC/FIN/Passport Number', value: fullNRICFINPassportNumber });
-    formFields.push({ label: 'Date of Birth', value: dateOfBirth });
-    formFields.push({ label: 'Sectors', value: sectors });
-    formFields.push({ label: 'Headline', value: headline });
-    formFields.push({ label: 'Gender', value: gender });
-    formFields.push({ label: 'Other: Scheduled Caste', value: otherScheduledCaste });
-    formFields.push({ label: 'GENDER', value: GENDER });
 
     // Perform any necessary actions on form submission
     console.log('Form Fields:', formFields);
@@ -98,15 +78,6 @@
 </script>
 
 <main>
-  <div class="container">
-    <div class="mb-3">
-      <label for="formSelect" class="form-label">Select Form:</label>
-      <select class="form-select" id="formSelect">
-        <option value={formId1}>Form 1</option>
-        <option value={formId2}>Form 2</option>
-      </select>
-    </div>
-
     <form on:submit="{handleSubmit}">
     <div class="form-group">
       <label  for="fullName"> Enter Full Name</label>
@@ -211,6 +182,12 @@
       <label   for="otherScheduledCaste">Other: Scheduled Caste</label>
       <input type="text" class="form-control" id="otherScheduledCaste" bind:value="{otherScheduledCaste}" placeholder="Other: Scheduled Caste">
     </div>
+    {#each formFields as field}
+    <div class="form-group">
+      <label for="{field.code}" class="{field.code}">{{field.label}}</label>
+      <input type="text" class="form-control" id="{field.code}" bind:value="{field[field.code]}" placeholder="{field.label}">
+    </div>
+    {/each}
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </main>
@@ -219,11 +196,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 </svelte:head>
 
-  <style>
-    .blue-label {
-      color: blue;
-    }
-  
+<style>
+  .blue-label {
+    color: blue;
+  }
+
   .form-group {
     margin-bottom: 20px;
   }
@@ -241,6 +218,4 @@
     opacity: 0;
     cursor: pointer;
   }
-
-  </style>
->>>>>>> b68183ef427102b702d88778fc2d81ba015143ee
+</style>
