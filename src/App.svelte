@@ -4,15 +4,28 @@
 
   let formFields = [];
   let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
+  let formData = {}; // Object to store form data
+
+  // Define initial form field definitions
+  let fieldDefinitions = [
+    { id: 'fullname', label: 'Fullname', value: '' },
+    { id: 'email', label: 'Email', value: '' },
+    { id: 'mobile', label: 'Mobile', value: '' },
+    { id: 'address', label: 'Address/Location', value: '' },
+    { id: 'languages', label: 'Languages', value: '' },
+    { id: 'experience', label: 'Experience', value: '' },
+    { id: 'dob', label: 'Date of Birth', value: '' },
+    { id: 'rating', label: 'Rating', value: '' }
+  ];
 
   function fetchData() {
     fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`)
       .then(response => response.json())
       .then(data => {
         console.log('API Response:', data);
-        formFields = Object.entries(data).map(([key, value]) => ({
-          label: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value
+        formFields = fieldDefinitions.map(field => ({
+          ...field,
+          value: data[field.id] || ''
         }));
       })
       .catch(error => {
@@ -21,20 +34,28 @@
   }
 
   function handleSubmit() {
+    // Clear the formFields array before populating it
+    formFields = [];
+
+    // Push the form input values to the formFields array
+    formFields = fieldDefinitions.map(field => ({
+      ...field,
+      value: formData[field.id] || ''
+    }));
+
     // Perform any necessary actions on form submission
     console.log('Form Fields:', formFields);
   }
 
-  function addField() {
-    formFields.push({ label: '', value: '' });
-  }
-
-  function removeField(index) {
-    formFields.splice(index, 1);
-  }
-
   onMount(() => {
-    fetchData(); // Fetch data on component mount
+    // Add an event listener to form fields
+    function handleFieldChange(event) {
+      formId = event.target.value;
+      fetchData(); // Fetch data when the form ID is changed
+    }
+
+    const fields = document.querySelectorAll('input[type="text"]');
+    fields.forEach(field => field.addEventListener('input', handleFieldChange));
   });
 </script>
 
@@ -74,17 +95,12 @@
 
 <div class="form-container">
   <form on:submit|preventDefault={handleSubmit}>
-    {#each formFields as field, index}
+    {#each formFields as field}
       <div class="form-group">
-        <label for={index} class="form-label">{field.label}</label>
-        <input type="text" id={index} class="form-control" bind:value={field.value} />
-        {#if index === formFields.length - 1}
-          <button type="button" class="btn btn-danger" on:click={() => removeField(index)}>Remove</button>
-        {/if}
+        <label for={field.id} class="form-label">{field.label}</label>
+        <input type="text" id={field.id} class="form-control" bind:value={formData[field.id]} />
       </div>
     {/each}
-
-    <button type="button" class="btn btn-success" on:click={addField}>Add Field</button>
 
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
