@@ -3,7 +3,10 @@
   import 'bootstrap/dist/css/bootstrap.min.css';
 
   let formFields = [];
-  let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7', 'a4fed172-671e-4d3e-810e-04f987b1c032';
+  let formId1 = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
+  let formId2 = 'abcdefg-1234-5678-90ab-cdef12345678';
+  let selectedFormId = formId1;
+
   let fullname = '';
   let email = '';
   let mobile = '';
@@ -25,10 +28,10 @@
 
   function fetchData() {
     const formData = {
-      formId,
+      formId: selectedFormId,
     };
 
-    fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`, {
+    fetch(`https://api.recruitly.io/api/candidateform/details/${selectedFormId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,18 +83,29 @@
   onMount(() => {
     // Add an event listener to form fields
     function handleFieldChange(event) {
-      formId = event.target.value;
+      selectedFormId = event.target.value;
       fetchData(); // Fetch data when the form ID is changed
     }
 
-    const fields = document.querySelectorAll('input[type="text"]');
-    fields.forEach(field => field.addEventListener('input', handleFieldChange));
+    const formSelect = document.querySelector('#formSelect');
+    formSelect.addEventListener('change', handleFieldChange);
+
+    // Fetch data for the initially selected form ID
+    fetchData();
   });
 </script>
 
 <main>
-  
-  <form on:submit="{handleSubmit}">
+  <div class="container">
+    <div class="mb-3">
+      <label for="formSelect" class="form-label">Select Form:</label>
+      <select class="form-select" id="formSelect">
+        <option value={formId1}>Form 1</option>
+        <option value={formId2}>Form 2</option>
+      </select>
+    </div>
+
+    <form on:submit="{handleSubmit}">
     <div class="form-group">
       <label  for="fullName"> Enter Full Name</label>
       <input type="text" class="form-control" id="fullname" bind:value="{fullname}"placeholder="Enter Full Name">
