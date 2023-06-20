@@ -2,205 +2,156 @@
   import { onMount } from 'svelte';
   import 'bootstrap/dist/css/bootstrap.min.css'
 
-  let fullName = '';
+  let formFields = [];
+  let formId = '72fbc0da-3810-4ad9-a922-1845f8974eb7';
+  let fullname = '';
   let email = '';
   let mobile = '';
-  let cvFile = null;
-  let fileContent = '';
-  let fileName = '';
   let address = '';
   let languages = '';
   let experience = '';
   let dob = '';
   let rating = '';
-  let formErrors = {};
 
-  async function handleFileChange(event) {
-    cvFile = event.target.files[0];
-    fileContent = await toBase64(cvFile);
-    fileName = cvFile.name;
+  function fetchData() {
+    fetch(`https://api.recruitly.io/api/candidateform/details/${formId}?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('API Response:', data);
+        fullname = data.fullname;
+        email = data.email;
+        mobile = data.mobile;
+        address = data.address;
+        languages = data.languages;
+        experience = data.experience;
+        dob = data.dob;
+        rating = data.rating;
+
+        // Update the form fields based on the fetched data
+        formFields = [
+          { label: 'Fullname', value: fullname },
+          { label: 'Email', value: email },
+          { label: 'Mobile', value: mobile },
+          { label: 'Address', value: address },
+          { label: 'Languages', value: languages },
+          { label: 'Experience', value: experience },
+          { label: 'Date of Birth', value: dob },
+          { label: 'Rating', value: rating }
+        ];
+      })
+      .catch(error => {
+        console.error('API Error:', error);
+      });
   }
 
-  async function uploadCV() {
-    formErrors = {};
+  function handleSubmit() {
+    // Clear the formFields array before populating it
+    formFields = [];
 
-    if (!isValidName(fullName.trim())) {
-      formErrors.fullName = 'Please enter a valid name with only letters.';
-    }
+    // Push the form input values to the formFields array
+    formFields.push({ label: 'Fullname', value: fullname });
+    formFields.push({ label: 'Email', value: email });
+    formFields.push({ label: 'Mobile', value: mobile });
+    formFields.push({ label: 'Address', value: address });
+    formFields.push({ label: 'Languages', value: languages });
+    formFields.push({ label: 'Experience', value: experience });
+    formFields.push({ label: 'Date of Birth', value: dob });
+    formFields.push({ label: 'Rating', value: rating });
 
-    if (!email.trim()) {
-      formErrors.email = 'Email is required.';
-    } else if (!isValidEmail(email)) {
-      formErrors.email = 'Please enter a valid email address.';
-    }
-
-    if (!mobile.trim()) {
-      formErrors.mobile = 'Mobile is required.';
-    } else if (!isValidMobile(mobile)) {
-      formErrors.mobile = 'Please enter a valid mobile number having 10 digits.';
-    }
-
-    if (!cvFile) {
-      formErrors.cvFile = 'CV file is required.';
-    }
-
-    if (Object.keys(formErrors).length === 0) {
-      const postData = {
-        fullName,
-        email,
-        mobile,
-        fileContent,
-        fileName,
-        address,
-        languages,
-        experience,
-        dob,
-        rating
-      };
-
-      try {
-        const response = await fetch('https://api.recruitly.io/api/candidateform/details/72fbc0da-3810-4ad9-a922-1845f8974eb7?apiKey=TEST45684CB2A93F41FC40869DC739BD4D126D77', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        });
-
-        // Handle the response as needed
-        if (response.ok) {
-          console.log('CV uploaded successfully');
-          resetForm();
-          location.reload();
-        } else {
-          console.error('Failed to upload CV');
-        }
-      } catch (error) {
-        console.error('Error uploading CV:', error);
-      }
-    }
-  }
-
-  function isValidName(name) {
-    const nameRegex = /^[A-Za-z]+$/;
-    return nameRegex.test(name);
-  }
-
-  function isValidEmail(email) {
-    // Basic email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  function isValidMobile(mobile) {
-    // Basic mobile number validation regex
-    const mobileRegex = /^[0-9+]{10}$/;
-    return mobileRegex.test(mobile);
-  }
-
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = error => reject(error);
-    });
-  }
-
-  function resetForm() {
-    fullName = '';
-    email = '';
-    mobile = '';
-    cvFile = null;
-    fileContent = '';
-    fileName = '';
-    address = '';
-    languages = '';
-    experience = '';
-    dob = '';
-    rating = '';
-    formErrors = {};
+    // Perform any necessary actions on form submission
+    
+    console.log('Form Fields:', formFields);
   }
 
   onMount(() => {
-    // Reset the file input after submission
-    const fileInput = document.getElementById('cvFileInput');
-    if (fileInput) {
-      fileInput.value = '';
+    // Add an event listener to form fields
+    function handleFieldChange(event) {
+      formId = event.target.value;
+      fetchData(); // Fetch data when the form ID is changed
     }
+
+    const fields = document.querySelectorAll('input[type="text"]');
+    fields.forEach(field => field.addEventListener('input', handleFieldChange));
   });
 </script>
 
-<svelte:head>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-  />
-</svelte:head>
-
-<div class="form-group">
-  <label for="firstName">Full Name:</label>
-  <input type="text" class="form-control" id="firstName" bind:value={fullName} placeholder="Enter your full name" />
-  {#if formErrors.fullName}
-  <p class="text-danger">{formErrors.fullName}</p>
-  {/if}
-</div>
-
-<div class="form-group">
-  <label for="email">Email:</label>
-  <input type="email" class="form-control" id="email" bind:value={email} placeholder="Enter your email" />
-  {#if formErrors.email}
-  <p class="text-danger">{formErrors.email}</p>
-  {/if}
-</div>
-
-<div class="form-group">
-  <label for="mobile">Mobile:</label>
-  <input type="tel" class="form-control" id="mobile" bind:value={mobile} placeholder="Enter your mobile number" />
-  {#if formErrors.mobile}
-  <p class="text-danger">{formErrors.mobile}</p>
-  {/if}
-</div>
-
-<div class="form-group">
-  <label for="cvFileInput">CV File:</label>
-  <input type="file" class="form-control" accept=".pdf,.doc,.docx" id="cvFileInput" on:change={handleFileChange} />
-  {#if formErrors.cvFile}
-  <p class="text-danger">{formErrors.cvFile}</p>
-  {/if}
-</div>
-
-<div class="form-group">
-  <label for="address">Address:</label>
-  <input type="text" class="form-control" id="address" bind:value={address} placeholder="Enter your address" />
-</div>
-
-<div class="form-group">
-  <label for="languages">Languages:</label>
-  <input type="text" class="form-control" id="languages" bind:value={languages} placeholder="Enter languages you know" />
-</div>
-
-<div class="form-group">
-  <label for="experience">Experience:</label>
-  <input type="text" class="form-control" id="experience" bind:value={experience} placeholder="Enter your experience" />
-</div>
-
-<div class="form-group">
-  <label for="dob">Date of Birth:</label>
-  <input type="date" class="form-control" id="dob" bind:value={dob} />
-</div>
-
-<div class="form-group">
-  <label for="rating">Rating:</label>
-  <input type="number" class="form-control" id="rating" bind:value={rating} min="0" max="5" step="0.1" placeholder="Enter your rating" />
-</div>
-
-<div class="form-group">
-  <button class="btn btn-primary" on:click={uploadCV}>Submit</button>
-</div>
-
 <style>
-  .text-danger {
-    color: red;
+  .form-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .form-container label {
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: bold;
+  }
+
+  .form-container input[type="text"] {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    width: 100%;
+    border-radius: 4px;
+  }
+
+  .form-container button {
+    margin-top: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .form-container button:hover {
+    background-color: #0056b3;
   }
 </style>
+
+
+<div class="form-container">
+  <form on:submit|preventDefault={handleSubmit}>
+    <div class="form-group">
+      <label for="fullname" class="form-label">Fullname</label>
+      <input type="text" id="fullname" class="form-control" bind:value={fullname} />
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="form-label">Email</label>
+      <input type="text" id="email" class="form-control" bind:value={email} />
+    </div>
+
+    <div class="form-group">
+      <label for="mobile" class="form-label">Mobile</label>
+      <input type="text" id="mobile" class="form-control" bind:value={mobile} />
+    </div>
+    
+    <div class="form-group">
+      <label for="address" class="form-label">Address/Location</label>
+      <input type="text" id="address" class="form-control" bind:value={address} />
+    </div>
+    
+    <div class="form-group">
+      <label for="languages" class="form-label">Languages</label>
+      <input type="text" id="languages" class="form-control" bind:value={languages} />
+    </div>
+    
+    <div class="form-group">
+      <label for="experience" class="form-label">Experience</label>
+      <input type="text" id="experience" class="form-control" bind:value={experience} />
+    </div>
+    
+    <div class="form-group">
+      <label for="dob" class="form-label">Date of Birth</label>
+      <input type="text" id="dob" class="form-control" bind:value={dob} />
+    </div>
+    
+    <div class="form-group">
+      <label for="rating" class="form-label">Rating</label>
+      <input type="text" id="rating" class="form-control" bind:value={rating} />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
