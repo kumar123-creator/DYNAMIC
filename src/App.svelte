@@ -9,6 +9,7 @@
   // Define initial form field definitions
   let fieldDefinitions = [
     { id: 'fullname', label: 'Fullname', value: '' },
+    { id: 'surname', label: 'Surname', value: '' },
     { id: 'email', label: 'Email', value: '' },
     { id: 'mobile', label: 'Mobile', value: '' },
     { id: 'address', label: 'Address/Location', value: '' },
